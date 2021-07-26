@@ -5,6 +5,30 @@ iptables -L INPUT
 #查看查看(默认filter表)INPUT链的规则!!注意大写!!
 iptables -vL INPUT
 #查看(默认filter表)INPUT具体详情
+iptables -vnL
+#不解析域名 直接以ip地址格式显示
+iptables --line-number -nvL INPUT
+#--line-number 显示规则的编号 --line 也可以
+iptables -nvxL
+#显示具体数值
+iptables -F INPUT
+#清空(默认filter表)链INPUT的规则
+iptables -t filter -I INPUT -s 192.168.29.132 -j DROP
+#将 拒绝192.168.29.132上的所有报文访问本机器 此条规则加入链INPUT
+iptables -A INPUT -s 192.168.29.132 -j ACCEPT
+#将 接受192.168.29.132上的所有报文访问本机器 此条规则加入链INPUT末尾
+iptables -I INPUT -s 192.168.29.132 -j ACCEPT
+#将 接受192.168.29.132上的所有报文访问本机器 此条规则加入链INPUT首行(-I 默认1就是第一条)
+iptables -t filter -D INPUT 2
+#删除filter表中INPUT链的第二行规则
+iptables -t filter -D INPUT -s 192.168.29.132 -j DROP 
+#删除filter表里INPUT链中源为192.168.29.132动作为ACCEPT的规则
+iptables -t filter -R INPUT 1 -s 192.168.29.132 -j REJECT
+#将表filter中链INPUT中符合源为192.168.29.132的动作改为REJECT(如果只想修改动作可以！！必须标明原地址不然会默认0.0.0.0即本网段中所有地址)
+iptables -t filter -P FORWARD DROP
+#将表filter中链FORWARD的默认动作改为DROP
+service iptables save
+#将对表filter规则做的修改保存(做过修改的所有表都会被保存) 保存地址为/etc/sysconfig/iptables
 
 #pkts:对应规则匹配到的报文的个数。
 #bytes:对应匹配到的报文包的大小总和。
